@@ -1,5 +1,5 @@
 <template>
-    <div class="home">首页</div>
+    <div class="login">登录</div>
 </template>
 
 <script lang="ts">
@@ -8,5 +8,5 @@ import { Component, Vue } from "vue-property-decorator";
 @Component({
     components: {}
 })
-export default class Home extends Vue {}
+export default class Login extends Vue {}
 </script>
