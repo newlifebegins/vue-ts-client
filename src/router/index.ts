@@ -15,7 +15,7 @@ const routes = [
         children: [{
             path: '/user/login',
             name: 'login',
-            component: () => import('@/views/user/login/Index.vue'),
+            component: () => import('@/views/user/login/Login.vue'),
         }, {
             path: '/user/forgetpassword',
             name: 'forgetpassword',
