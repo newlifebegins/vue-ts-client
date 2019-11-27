@@ -14,19 +14,15 @@
                     <i slot="prefix" class="el-icon-s-custom"></i>
                 </el-input>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input
-                    type="password"
-                    v-model="form.password"
-                    autocomplete="off"
-                    placeholder="密码"
-                >
+            <el-form-item label="密码" prop="pwd">
+                <el-input type="password" v-model="form.pwd" autocomplete="off" placeholder="密码">
                     <i slot="prefix" class="el-icon-view"></i>
                 </el-input>
             </el-form-item>
             <el-form-item>
                 <el-button
                     type="primary"
+                    :loading="isLogin"
                     @click.native.prevent="submitForm()"
                     @keyup.enter="submitForm()"
                 >登录</el-button>
@@ -52,18 +48,23 @@
 <script lang="ts">
 // @ is an alias to /src
 import { Component, Vue, Provide } from "vue-property-decorator";
+import { getModule } from "vuex-module-decorators";
+import { UserModule } from "@/store/modules/user";
 import Layout from "./Index.vue";
 @Component({
     components: { Layout }
 })
 export default class Login extends Vue {
+    // 存储用户信息
+    // @Action("setUserInfo") setUserInfo: any;
+    @Provide() isLogin: boolean = false;
     @Provide() form: {
         username: String;
-        password: String;
+        pwd: String;
         autoLogin: boolean;
     } = {
         username: "",
-        password: "",
+        pwd: "",
         autoLogin: true // 是否自动登录
     };
 
@@ -71,13 +72,25 @@ export default class Login extends Vue {
         username: [
             { required: true, message: "请输入用户名", trigger: "blur" }
         ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+        pwd: [{ required: true, message: "请输入密码", trigger: "blur" }]
     };
 
     submitForm(): void {
         (this.$refs["ruleForm"] as any).validate((valid: boolean) => {
-            if(valid) {
-                console.log('验证通过')
+            if (valid) {
+                this.isLogin = true;
+                (this as any).$axios
+                    .post("/api/users/login", this.form)
+                    .then((res: any) => {
+                        let { msg, state, token } = res.data;
+                        if (state === "suc") {
+                            UserModule.setUserInfo(token);
+                            this.isLogin = false;
+                        }
+                    })
+                    .catch(() => {
+                        this.isLogin = false;
+                    });
             }
         });
     }
